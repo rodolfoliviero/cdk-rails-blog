@@ -1,0 +1,35 @@
+version: '3.7'
+services:
+  # db:
+  #   image: postgres:12-alpine
+  #   environment:
+  #     - POSTGRES_PASSWORD=password
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+  #   ports:
+  #     - 127.0.0.1:${PG_PORT}:5432
+  app:
+    #user: root
+    # image: rainkinz/blog-app:latest
+    build:
+      context: .
+      args:
+        # Install dev and test gems
+        - BUNDLE_WITHOUT=production
+    tty: true # do we need this?
+    stdin_open: true # do we need this
+    environment:
+      - RAILS_ENV
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - POSTGRES_PASSWORD=password
+      - DB_HOST=db
+      - SECRET_KEY_BASE=we-dont-need-a-secret-here
+    ports:
+      - 127.0.0.1:${APP_PORT:-3006}:3006
+    # links:
+    #   - db
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3006 -b '0.0.0.0'"
+    #
+volumes:
+  db-data:
